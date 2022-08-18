@@ -1,12 +1,16 @@
 package usecase
 
 import (
+	"encoding/json"
+
 	"github.com/aduilio/codebank/domain"
 	"github.com/aduilio/codebank/dto"
+	"github.com/aduilio/codebank/infrastructure/kafka"
 )
 
 type UseCaseTransaction struct {
 	TransactionRepository domain.TransactionRepository
+	KafkaProducer         kafka.KafkaProducer
 }
 
 func NewUseCaseTransaction(transactionRepository domain.TransactionRepository) UseCaseTransaction {
@@ -30,8 +34,18 @@ func (u UseCaseTransaction) ProcessTransaction(transactionDto dto.Transaction) (
 	if err != nil {
 		return domain.Transaction{}, err
 	}
+	transactionDto.ID = transaction.ID
+	transactionDto.CreatedAt = transaction.CreatedAt
+	transactionJson, err := json.Marshal(transactionDto)
+	if err != nil {
+		return *transaction, err
+	}
+	err = u.KafkaProducer.Publish(string(transactionJson), "payments")
+	if err != nil {
+		return *transaction, err
+	}
 
-	return domain.Transaction{}, nil
+	return *transaction, nil
 }
 
 func (UseCaseTransaction) creditCard(transactionDto dto.Transaction) *domain.CreditCard {
