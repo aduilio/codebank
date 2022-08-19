@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/golang/protobuf v1.5.2
+	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.6
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect

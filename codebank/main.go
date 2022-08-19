@@ -3,14 +3,23 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	"github.com/aduilio/codebank/domain"
 	"github.com/aduilio/codebank/infrastructure/grpc/server"
 	"github.com/aduilio/codebank/infrastructure/kafka"
 	"github.com/aduilio/codebank/infrastructure/repository"
 	"github.com/aduilio/codebank/usecase"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env files")
+	}
+}
 
 func main() {
 	db := setupDb()
@@ -24,13 +33,13 @@ func main() {
 func setupDb() *sql.DB {
 	psql := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		"db",
-		"5432",
-		"postgres",
-		"root",
-		"codebank",
+		os.Getenv("db_host"),
+		os.Getenv("db_port"),
+		os.Getenv("db_user"),
+		os.Getenv("db_password"),
+		os.Getenv("db_name"),
 	)
-	db, err := sql.Open("postgres", psql)
+	db, err := sql.Open(os.Getenv("db_driver"), psql)
 	if err != nil {
 		fmt.Println("Error connecting to database")
 	}
@@ -47,7 +56,7 @@ func setupUseCase(db *sql.DB, producer kafka.KafkaProducer) usecase.UseCaseTrans
 
 func setupKafkaProducer() kafka.KafkaProducer {
 	producer := kafka.NewKafkaProducer()
-	producer.SetupProducer("host.docker.internal:9094")
+	producer.SetupProducer(os.Getenv("kafka_bootstrap_servers"))
 	return producer
 }
 
