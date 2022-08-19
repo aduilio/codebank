@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aduilio/codebank/domain"
+	"github.com/aduilio/codebank/infrastructure/grpc/server"
+	"github.com/aduilio/codebank/infrastructure/kafka"
 	"github.com/aduilio/codebank/infrastructure/repository"
 	"github.com/aduilio/codebank/usecase"
 	_ "github.com/lib/pq"
@@ -13,20 +15,10 @@ import (
 func main() {
 	db := setupDb()
 	defer db.Close()
-	cc := domain.NewCreditCard()
-	cc.Number = "1234567887654321"
-	cc.Name = "Aduilio"
-	cc.ExpirationYear = 2024
-	cc.ExpirationMonth = 11
-	cc.CVV = 123
-	cc.Balance = 0
-	cc.Limit = 1000
-
-	repo := repository.NewTransactionRepositoryDb(db)
-	err := repo.CreateCreditCard(*cc)
-	if err != nil {
-		fmt.Println(err)
-	}
+	producer := setupKafkaProducer()
+	processTransactionUseCase := setupUseCase(db, producer)
+	fmt.Println("Running gRPC server")
+	serveGrpc(processTransactionUseCase)
 }
 
 func setupDb() *sql.DB {
@@ -45,9 +37,39 @@ func setupDb() *sql.DB {
 	return db
 }
 
-func setupUseCase(db *sql.DB) usecase.UseCaseTransaction {
+func setupUseCase(db *sql.DB, producer kafka.KafkaProducer) usecase.UseCaseTransaction {
 	transactionRepositoryDb := repository.NewTransactionRepositoryDb(db)
 	useCase := usecase.NewUseCaseTransaction(transactionRepositoryDb)
+	useCase.KafkaProducer = producer
 
 	return useCase
+}
+
+func setupKafkaProducer() kafka.KafkaProducer {
+	producer := kafka.NewKafkaProducer()
+	producer.SetupProducer("host.docker.internal:9094")
+	return producer
+}
+
+func serveGrpc(processTransactionUseCase usecase.UseCaseTransaction) {
+	grpcServer := server.NewGRPCServer()
+	grpcServer.ProcessTransactionUseCase = processTransactionUseCase
+	grpcServer.Serve()
+}
+
+func createCreditCard(db *sql.DB) {
+	cc := domain.NewCreditCard()
+	cc.Number = "1234567887654321"
+	cc.Name = "Aduilio"
+	cc.ExpirationYear = 2024
+	cc.ExpirationMonth = 11
+	cc.CVV = 123
+	cc.Balance = 0
+	cc.Limit = 1000
+
+	repo := repository.NewTransactionRepositoryDb(db)
+	err := repo.CreateCreditCard(*cc)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

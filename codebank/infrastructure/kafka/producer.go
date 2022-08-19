@@ -1,6 +1,8 @@
 package kafka
 
 import (
+	"fmt"
+
 	ckafka "github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
@@ -12,14 +14,16 @@ func NewKafkaProducer() KafkaProducer {
 	return KafkaProducer{}
 }
 
-func (k *KafkaProducer) setupProducer(bootstrapServer string) {
+func (k *KafkaProducer) SetupProducer(bootstrapServer string) {
 	configMap := &ckafka.ConfigMap{
-		"bootstrap.server": bootstrapServer,
+		"bootstrap.servers": bootstrapServer,
 	}
 	k.Producer, _ = ckafka.NewProducer(configMap)
 }
 
 func (k *KafkaProducer) Publish(msg string, topic string) error {
+	fmt.Println(fmt.Sprintf("Topic: %s Message: %s", topic, msg))
+
 	message := &ckafka.Message{
 		TopicPartition: ckafka.TopicPartition{Topic: &topic, Partition: ckafka.PartitionAny},
 		Value:          []byte(msg),

@@ -20,7 +20,7 @@ func NewGRPCServer() GRPCServer {
 }
 
 func (s GRPCServer) Serve() {
-	listener, err := net.Listen("tcp", "0.0.0.0:50051")
+	listener, err := net.Listen("tcp", "0.0.0.0:50052")
 	if err != nil {
 		fmt.Println("Could not run the server")
 	}
