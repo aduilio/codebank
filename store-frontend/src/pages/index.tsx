@@ -1,45 +1,44 @@
-import { Button, Card, CardActions, CardContent, CardMedia, Typography } from '@material-ui/core'
+import { Button, Card, CardActions, CardContent, CardMedia, Grid, Typography } from '@material-ui/core'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
-import styles from '../../styles/Home.module.css'
-import { Product } from './model'
-
-const products: Product[] = [
-    {
-        id: "uuid",
-        name: "Product name",
-        description: "Product description with a lot of words to test long sentences",
-        price: 50.50,
-        image_url: "https://source.unsplash.com/random?product",
-        slug: "teste",
-        created_at: "2022-10-11 10:45:21"
-    }
-]
+import Link from 'next/link'
+import { Product, products } from '../model'
 
 export default function ProductsListPage() {
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
         <title>Products List</title>
       </Head>
-      <Typography component="h1" variant="h3" color="inherit" gutterBottom>
+      <Typography component="h1" variant="h3" color="textPrimary" gutterBottom>
         Products
       </Typography>
-      {products.map((product, key) => (
-        <Card key={key}>
-            <CardMedia image={product.image_url}/>
-            <CardContent>
-                <Typography component="h2" variant="h5" gutterBottom>
-                    {product.name}
-                </Typography>
-            </CardContent>
-            <CardActions>
-                <Button size="small" color="primary" component="a">Details</Button>
-
-            </CardActions>
-        </Card>
-      ))}
+      <Grid container spacing={4}>
+        {products.map((product, key) => (
+            <Grid key={key} item xs={12} sm={6} md={4}>
+                <Card>
+                    <CardMedia style={{paddingTop: '56%'}} image={product.image_url}/>
+                    <CardContent>
+                        <Typography component="h2" variant="h5" gutterBottom>
+                            {product.name}
+                        </Typography>
+                    </CardContent>
+                    <CardActions>
+                        <Link 
+                            href="/products/[slug]"
+                            as={`/products/${product.slug}`}
+                            passHref
+                        >
+                            <Button size="small" color="primary" component="a">
+                                Details
+                            </Button>
+                        </Link>
+                    </CardActions>
+                </Card>
+            </Grid>
+        ))}
+      </Grid>
     </div>
   );
 }
