@@ -1,11 +1,17 @@
 import { Button, Card, CardActions, CardContent, CardMedia, Grid, Typography } from '@material-ui/core'
-import type { NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
 import Link from 'next/link'
+import http from '../http'
 import { Product, products } from '../model'
 
-export default function ProductsListPage() {
+interface ProductsListPageProps {
+    products: Product[];
+}
+
+//const ProductsListPage: NextPage<ProductsListPageProps> = ({ products }) => {
+const ProductsListPage = () => {
+  const productsx = products
   return (
     <div>
       <Head>
@@ -15,7 +21,7 @@ export default function ProductsListPage() {
         Products
       </Typography>
       <Grid container spacing={4}>
-        {products.map((product, key) => (
+        {productsx.map((product, key) => (
             <Grid key={key} item xs={12} sm={6} md={4}>
                 <Card>
                     <CardMedia style={{paddingTop: '56%'}} image={product.image_url}/>
@@ -42,3 +48,15 @@ export default function ProductsListPage() {
     </div>
   );
 }
+
+export default ProductsListPage;
+
+export const getServerSideProps: GetServerSideProps<ProductsListPageProps> = async (context) => {
+    const { data: products } = await http.get("products");
+    console.log(products);
+    return {
+      props: {
+        products,
+      },
+    };
+  };
