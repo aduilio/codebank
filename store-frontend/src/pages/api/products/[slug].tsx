@@ -7,5 +7,5 @@ export default function handler(
 ) {
     const {slug} = req.query;
     const product = products.find(p => p.slug === slug);
-    res.status(200).json(product!)
+    product? res.status(200).json(product) : res.status(404);
 }
