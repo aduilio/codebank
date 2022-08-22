@@ -26,7 +26,7 @@ export const products: Product[] = [
         description: "Product description with a lot of words to test long sentences",
         price: 50.50,
         image_url: "https://source.unsplash.com/random?product," + Math.random(),
-        slug: "teste",
+        slug: "other",
         created_at: "2022-10-11 10:45:21"
     }
 ]

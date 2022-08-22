@@ -9,9 +9,7 @@ interface ProductsListPageProps {
     products: Product[];
 }
 
-//const ProductsListPage: NextPage<ProductsListPageProps> = ({ products }) => {
-const ProductsListPage = () => {
-  const productsx = products
+const ProductsListPage: NextPage<ProductsListPageProps> = ({ products }) => {
   return (
     <div>
       <Head>
@@ -21,7 +19,7 @@ const ProductsListPage = () => {
         Products
       </Typography>
       <Grid container spacing={4}>
-        {productsx.map((product, key) => (
+        {products.map((product, key) => (
             <Grid key={key} item xs={12} sm={6} md={4}>
                 <Card>
                     <CardMedia style={{paddingTop: '56%'}} image={product.image_url}/>

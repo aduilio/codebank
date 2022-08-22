@@ -1,16 +1,20 @@
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Typography } from '@material-ui/core'
-import type { NextPage } from 'next'
+import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
+import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head'
-import Image from 'next/image'
-import { Product, products } from '../../model'
+import http from '../../http'
+import { Product } from '../../model'
 
 interface ProductDetailsPageProps {
     product: Product
 }
 
-// const ProductDetailPage: NextPage<ProductDetailsPageProps> = ({product}) => {
-const ProductDetailPage = () => {
-  const product = products[0]  
+const ProductDetailPage: NextPage<ProductDetailsPageProps> = ({product}) => {
+    const router = useRouter();
+    if (router.isFallback) {
+        return <div>Carregando...</div>
+    }
+
   return (
     <div>
       <Head>
@@ -36,3 +40,25 @@ const ProductDetailPage = () => {
 }
 
 export default ProductDetailPage
+
+export const getStaticProps: GetStaticProps<ProductDetailsPageProps, {slug: string}> = async (context) => {
+    const {slug} = context.params!;
+    const { data: product } = await http.get(`products/${slug}`);
+    console.log(product);
+    return {
+        props: {
+            product,
+        },
+        revalidate: 1 * 60 * 2,
+    };
+  };
+
+export const getStaticPaths: GetStaticPaths = async (context) => {
+    const { data: products } = await http.get(`products`);
+  
+    const paths = products.map((p: Product) => ({
+      params: { slug: p.slug },
+    }));
+  
+    return { paths, fallback: "blocking" };
+  };
