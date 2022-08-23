@@ -6,6 +6,8 @@ export default function handler(
   res: NextApiResponse<Product>
 ) {
     const {slug} = req.query;
+    console.log(slug)
     const product = products.find(p => p.slug === slug);
-    product? res.status(200).json(product) : res.status(404);
+    console.log(product)
+    product ? res.status(200).json(product) : res.status(404);
 }

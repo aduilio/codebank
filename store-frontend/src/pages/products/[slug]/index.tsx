@@ -3,8 +3,9 @@ import axios from 'axios'
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head'
-import http from '../../http'
-import { Product } from '../../model'
+import Link from 'next/link'
+import http from '../../../http'
+import { Product } from '../../../model'
 
 interface ProductDetailsPageProps {
     product: Product
@@ -16,25 +17,31 @@ const ProductDetailPage: NextPage<ProductDetailsPageProps> = ({product}) => {
         return <div>Carregando...</div>
     }
 
-  return (
-    <div>
-      <Head>
-        <title>{product.name}</title>
-      </Head>
-      <Card>
-        <CardHeader
-            title={product.name.toUpperCase()}
-            subheader={`R$ ${product.price}`}
-        />
-        <CardActions>
-            <Button size="small" color="primary" component="a">Comprar</Button>
-        </CardActions>
-        <CardMedia style={{paddingTop: '56%'}} image={product.image_url}/>
-        <CardContent>
-            <Typography component="p" variant="body2" color="textSecondary">
-                {product.description}
-            </Typography>
-        </CardContent>
+    return (
+        <div>
+            <Head>
+                <title>{product.name}</title>
+            </Head>
+            <Card>
+                <CardHeader
+                    title={product.name.toUpperCase()}
+                    subheader={`R$ ${product.price}`}
+                />
+                <CardActions>
+                    <Link 
+                        href="/products/[slug]/order"
+                        as={`/products/${product.slug}/order`}
+                        passHref
+                    >
+                         <Button size="small" color="primary" component="a">Buy</Button>
+                    </Link>
+                </CardActions>
+                <CardMedia style={{paddingTop: '56%'}} image={product.image_url}/>
+                <CardContent>
+                <Typography component="p" variant="body2" color="textSecondary">
+                    {product.description}
+                </Typography>
+            </CardContent>
         </Card>
     </div>
   );
@@ -45,6 +52,7 @@ export default ProductDetailPage
 export const getStaticProps: GetStaticProps<ProductDetailsPageProps, {slug: string}> = async (context) => {
     const {slug} = context.params!;
     try {
+        console.log(slug);
         const { data: product } = await http.get(`products/${slug}`);
         console.log(product);
         return {
@@ -54,6 +62,7 @@ export const getStaticProps: GetStaticProps<ProductDetailsPageProps, {slug: stri
             revalidate: 1 * 60 * 2,
         };
     } catch(e) {
+        console.log(e);
         if (axios.isAxiosError(e) && e.response?.status == 404) {
             return {notFound: true};
         }
@@ -65,8 +74,8 @@ export const getStaticPaths: GetStaticPaths = async (context) => {
     const { data: products } = await http.get(`products`);
   
     const paths = products.map((p: Product) => ({
-      params: { slug: p.slug },
+        params: { slug: p.slug },
     }));
   
     return { paths, fallback: "blocking" };
-  };
+};
