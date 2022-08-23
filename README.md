@@ -2,7 +2,17 @@
 
 A simple digital bank to process credit card transactions.
 
+## codebank
+
+Golang application to receive the transactions.
+
+## store-frontend
+
+Next.js application to order a product.
+
 ## Development
+
+### codebank
 
 Change the __*.env*__ file to setup the environment.
 
@@ -27,9 +37,9 @@ A container with the following:
 - the Golong environment to execute the application.
 - evans: a gPRC client 
 
-## Code Bank
+### store-frontend
 
-Golang application to receive the transactions
+Execute __*docker-compose up -d*__ to run a container with the pre-configured environment.
 
 ## Kafka
 
