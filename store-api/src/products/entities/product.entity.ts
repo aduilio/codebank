@@ -7,19 +7,19 @@ export class Product {
     id: string;
 
     @Column()
-    name: string
+    name: string;
 
     @Column()
-    description: string
+    description: string;
 
     @Column()
-    image_urm: string
+    image_url: string;
 
     @Column()
-    slug: string
+    slug: string;
 
     @Column()
-    price: number
+    price: number;
 
     @CreateDateColumn({type: 'timestamp'})
     created_at: Date;

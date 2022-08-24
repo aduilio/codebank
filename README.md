@@ -10,6 +10,10 @@ Golang application to receive the transactions.
 
 Next.js application to order a product.
 
+## store-api
+
+Nest.js application to provide the products.
+
 ## Development
 
 ### codebank
@@ -41,7 +45,9 @@ A container with the following:
 
 Execute __*docker-compose up -d*__ to run a container with the pre-configured environment.
 
-## Kafka
+### store-api
 
-## Nest.js and Next.js
+Execute __*docker-compose up -d*__ to run a container with the pre-configured environment.
+
+## Kafka
 
